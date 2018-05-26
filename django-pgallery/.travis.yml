@@ -1,0 +1,40 @@
+sudo: false
+language: python
+python:
+    - "3.5"
+    - "3.6"
+addons:
+  postgresql: "9.4"
+env:
+  - TOXENV=py27-dj110 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+  - TOXENV=py35-dj110 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+  - TOXENV=py27-dj111 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+  - TOXENV=py35-dj111 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+  - TOXENV=py36-dj111 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+  - TOXENV=coverage DATABASE_USER="postgres" DATABASE_PASSWORD=""
+matrix:
+  exclude:
+    - python: "3.5"
+      env: TOXENV=py36-dj111 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+    - python: "3.5"
+      env: TOXENV=coverage DATABASE_USER="postgres" DATABASE_PASSWORD=""
+    - python: "3.6"
+      env: TOXENV=py27-dj110 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+    - python: "3.6"
+      env: TOXENV=py27-dj111 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+    - python: "3.6"
+      env: TOXENV=py35-dj110 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+    - python: "3.6"
+      env: TOXENV=py35-dj111 DATABASE_USER="postgres" DATABASE_PASSWORD=""
+install:
+  - pip install pip setuptools --upgrade
+  - pip install tox
+  - if [ "$TOXENV" = "coverage" ]; then pip install coveralls; fi
+before_script:
+  - psql -c 'create extension hstore;' -U postgres -d template1
+  - psql -c 'create database pgallery;' -U postgres
+script:
+  - export PYTHONPATH=$PYTHONPATH:`pwd`
+  - tox
+after_success:
+  - if [ "$TOXENV" = "coverage" ]; then coveralls; fi

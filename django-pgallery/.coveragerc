@@ -1,0 +1,10 @@
+[report]
+omit =
+    pgallery/__init__.py
+    */migrations/*
+    ../src/*
+    ../lib/*
+    */test*
+    */site-packages/*
+    */django-admin.py
+    /home/travis/virtualenv/*
